@@ -1,0 +1,2 @@
+
+from bmapi.settings import *
