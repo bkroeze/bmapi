@@ -1,16 +1,17 @@
-
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.contrib import admin
+admin.autodiscover()
+import logging
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+log = logging.getLogger(__name__)
+
+handler500 # Pyflakes
 
 urlpatterns = patterns(
     '',
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/0.1/', include('bmapi.api.urls')),
 
     url(r'^accounts/profile/create/$',
         'profiles.views.create_profile',
@@ -29,6 +30,14 @@ urlpatterns = patterns(
         name='profiles_profile_detail'),
 
     url(r'^accounts/', include('registration.urls')),
+
+    url(r'^gallery/(?P<url>.*)$',
+        'httpproxy.views.proxy',
+        {'proxy_server' : 'mediagallery'}),
+
+    url(r'^events/(?P<url>.*)$',
+        'httpproxy.views.proxy',
+        {'proxy_server' : 'playaevents'})
 )
 
 if settings.DEBUG:
@@ -36,4 +45,8 @@ if settings.DEBUG:
         (r'^media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': settings.MEDIA_ROOT}),
     )
+    log.debug('debug urls')
+else:
+    log.debug('production urls')
+
 

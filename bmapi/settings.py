@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'registration',
     'bmprofile',
     'signedauth',
+    'httpproxy',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -158,5 +159,14 @@ CACHE_TIMEOUT = 60*60*24
 DEBUG_TOOLBAR_CONFIG = { 'INTERCEPT_REDIRECTS': False }
 
 LOGGED_IN_ONLY = False
+
+PROXY_DOMAINS = {
+    'playaevents' : {
+        'server' : 'playaevents.burningman.com',
+        },
+    'mediagallery' : {
+        'server' : 'gallery.burningman.com',
+        }
+}
 
 from settings_local import *
