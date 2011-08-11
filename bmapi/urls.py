@@ -13,23 +13,23 @@ urlpatterns = patterns(
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^accounts/profile/create/$',
-        'profiles.views.create_profile',
-        name='profiles_create_profile'),
+    # url(r'^accounts/profile/create/$',
+    #     'profiles.views.create_profile',
+    #     name='profiles_create_profile'),
 
-    url(r'^accounts/profile/edit/$',
-        'profiles.views.edit_profile',
-        name='profiles_edit_profile'),
+    # url(r'^accounts/profile/edit/$',
+    #     'profiles.views.edit_profile',
+    #     name='profiles_edit_profile'),
 
-    url(r'^accounts/profile/$',
-        'bmprofile.views.my_profile',
-        name='profiles_profile_my_detail'),
+    # url(r'^accounts/profile/$',
+    #     'bmprofile.views.my_profile',
+    #     name='profiles_profile_my_detail'),
 
-    url(r'^accounts/profile/(?P<username>\w+)/$',
-        'bmprofile.views.my_profile',
-        name='profiles_profile_detail'),
+    # url(r'^accounts/profile/(?P<username>\w+)/$',
+    #     'bmprofile.views.my_profile',
+    #     name='profiles_profile_detail'),
 
-    url(r'^accounts/', include('registration.urls')),
+    # url(r'^accounts/', include('registration.urls')),
 
     url(r'^gallery/(?P<url>.*)$',
         'httpproxy.views.proxy',
