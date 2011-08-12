@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'bmprofile',
     'signedauth',
     'httpproxy',
+    'bmapi.localsite'
 )
 
 # A sample logging configuration. The only tangible logging
