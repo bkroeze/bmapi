@@ -81,7 +81,7 @@ class Command(BaseCommand):
                     data['location_string'] = loc
                     if ' ' in loc:
                         timestr, distance = row[keys['location']].split(' ',1)
-                        if timestr[0] in ['0123456789']:
+                        if timestr[0] in '0123456789':
                             if not ':' in timestr:
                                 timestr = '%s:00' % timestr
                             data['time_address'] = timestr
