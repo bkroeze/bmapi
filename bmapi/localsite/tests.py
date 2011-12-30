@@ -6,6 +6,7 @@ from unittest import skipIf
 from bmapi.proxy_utils import proxy_url
 from urllib2 import Request, urlopen, URLError, HTTPError
 from signedauth.models import sign_url
+import imghdr
 import logging
 import random
 
@@ -53,11 +54,9 @@ def check_active(key):
         print SETUP_MESSAGE % key
 
     ACTIVES[key] = active
+    return active
 
-for serverkey in ('playaevents','mediagallery','rideshare'):
-    check_active(serverkey)
-
-@skipIf(not ACTIVES['playaevents'], "No Playaevents server")
+@skipIf(not check_active('playaevents'), "No Playaevents server")
 class TestPlayaevents(TestCase):
     def setUp(self):
         self.client = Client()
@@ -127,15 +126,68 @@ class TestPlayaevents(TestCase):
         for key in keys1:
             self.assertEqual(camp[key], camp2[key])
 
-@skipIf(not ACTIVES['mediagallery'], "No Media Gallery server")
+@skipIf(not check_active('mediagallery'), "No Media Gallery server")
 class TestMediagallery(TestCase):
     def setUp(self):
-        pass
+        self.client = Client()
 
     def testOne(self):
         log.info('Gallery active')
 
-@skipIf(not ACTIVES['rideshare'], "No Rideshare server")
+    def testGetImageNoAuth(self):
+        url = '/gallery/api/photos/alesp/alesp.43340/image'
+
+        response = self.client.get(url)
+        # 401 = forbidden
+        self.assertEqual(response.status_code, 401)
+
+    @skipIf('mediagallery' not in AUTHS, 'No authentication key for MediaGallery')
+    def testGetImageAuth(self):
+        url = '/gallery/api/photos/alesp/alesp.43340/image'
+        user, key = AUTHS['mediagallery']
+        seed = random.randint(0,1000000000)
+
+        url = sign_url(url, user, key, seed=str(seed))
+
+        response = self.client.get(url)
+        if response.status_code == 401:
+            print """Got a forbidden response from the Gallery server, are you sure that you are using the right user & key?
+This is set in PROXY_DOMAINS with "authuser" and "authkey".  Currently you have:
+user=%s and key=%s""" % (user, key)
+
+        self.assertEqual(response.status_code, 200)
+        imgtype = imghdr.what('',response.content)
+        self.assertEqual(imgtype, 'jpeg')
+
+    @skipIf('mediagallery' not in AUTHS, 'No authentication key for MediaGallery')
+    def testGetImageDetl(self):
+        url = '/gallery/api/photos/alesp/alesp.43340/json'
+        user, key = AUTHS['mediagallery']
+        seed = random.randint(0,1000000000)
+
+        url = sign_url(url, user, key, seed=str(seed))
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = simplejson.loads(response.content)
+        self.assertEqual(data['status'], 'approved')
+        self.assertEqual(data['year'], 2011)
+        self.assertEqual(data['title'], 'Gold and Silver Duo')
+
+    @skipIf('mediagallery' not in AUTHS, 'No authentication key for MediaGallery')
+    def testGetImageCaption(self):
+        url = '/gallery/api/photos/alesp/alesp.43340/caption'
+        user, key = AUTHS['mediagallery']
+        seed = random.randint(0,1000000000)
+
+        url = sign_url(url, user, key, seed=str(seed))
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Gold and Silver Duo')
+
+
+@skipIf(not check_active('rideshare'), "No Rideshare server")
 class TestRideshare(TestCase):
     def setUp(self):
         pass
