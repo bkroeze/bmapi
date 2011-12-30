@@ -167,6 +167,9 @@ PROXY_DOMAINS = {
         },
     'mediagallery' : {
         'server' : 'gallery.burningman.com',
+        },
+    'rideshare' : {
+        'server' : 'rideshare.burningman.com',
         }
 }
 

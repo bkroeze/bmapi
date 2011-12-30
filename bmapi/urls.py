@@ -32,12 +32,17 @@ urlpatterns = patterns(
     # url(r'^accounts/', include('registration.urls')),
 
     url(r'^gallery/(?P<url>.*)$',
-        'httpproxy.views.proxy',
-        {'proxy_server' : 'mediagallery'}),
+        'bmapi.views.smart_proxy',
+        {'proxy_server' : 'mediagallery', 'prefix' : '/gallery'}),
 
     url(r'^events/(?P<url>.*)$',
-        'httpproxy.views.proxy',
-        {'proxy_server' : 'playaevents'})
+        'bmapi.views.smart_proxy',
+        {'proxy_server' : 'playaevents', 'prefix' : '/events'}),
+
+    url(r'^rideshare/(?P<url>.*)$',
+        'bmapi.views.smart_proxy',
+        {'proxy_server' : 'rideshare', 'prefix' : '/rideshare'})
+
 )
 
 if settings.DEBUG:
