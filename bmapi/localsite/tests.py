@@ -6,6 +6,7 @@ from unittest import skipIf
 from bmapi.proxy_utils import proxy_url
 from urllib2 import Request, urlopen, URLError, HTTPError
 from signedauth.models import sign_url
+import dateutil.parser
 import imghdr
 import logging
 import random
@@ -195,4 +196,51 @@ class TestRideshare(TestCase):
     def testOne(self):
         log.info('Rideshare active')
 
+    def testGetRideshareNoAuth(self):
+        url = '/rideshare/api/rideshare/304/'
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = simplejson.loads(response.content)
+
+        self.assertEqual(data['camp'], 'Camposanto')
+        self.assert_('contact_email' not in data)
+        self.assert_('latest_departure' in data and data['latest_departure'] is not None)
+
+        parser = dateutil.parser.parser()
+        raw = data['latest_departure']
+        dt = parser.parse(raw)
+        self.assertEqual(dt.year, 2011)
+        self.assertEqual(dt.month, 9)
+        self.assertEqual(dt.day, 5)
+
+
+
+    @skipIf('rideshare' not in AUTHS, 'No authentication key for Rideshare')
+    def testGetRidshareAuth(self):
+        url = '/rideshare/api/rideshare/304/'
+        user, key = AUTHS['rideshare']
+        seed = random.randint(0,1000000000)
+
+        url = sign_url(url, user, key, seed=str(seed))
+
+        response = self.client.get(url)
+        if response.status_code == 401:
+            print """Got a forbidden response from the Rideshare server, are you sure that you are using the right user & key?
+This is set in PROXY_DOMAINS with "authuser" and "authkey".  Currently you have:
+user=%s and key=%s""" % (user, key)
+
+        self.assertEqual(response.status_code, 200)
+        data = simplejson.loads(response.content)
+
+        self.assertEqual(data['camp'], 'Camposanto')
+        self.assert_('contact_email' in data)
+        self.assert_('latest_departure' in data and data['latest_departure'] is not None)
+
+        parser = dateutil.parser.parser()
+        raw = data['latest_departure']
+        dt = parser.parse(raw)
+        self.assertEqual(dt.year, 2011)
+        self.assertEqual(dt.month, 9)
+        self.assertEqual(dt.day, 5)
 
