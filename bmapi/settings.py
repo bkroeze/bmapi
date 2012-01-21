@@ -116,7 +116,8 @@ INSTALLED_APPS = (
     'bmprofile',
     'signedauth',
     'httpproxy',
-    'bmapi.localsite'
+    'bmapi.localsite',
+    'gunicorn',
 )
 
 # A sample logging configuration. The only tangible logging
